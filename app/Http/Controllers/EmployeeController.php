@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
-    const TITLE_BASE  = 'Création employé';
-    const H1_CREATION = 'Création fiche employé';
-    const H1_RECAP    = 'Récapitulatif ';
-    const CONTRAT     = 'CTT';
-    const PLANNING    = 'Planning semaine ';
-    const DRIVER_PLN  = 'PLN';
+    const TITLE_BASE      = 'Création employé';
+    const H1_CREATION     = 'Création fiche employé';
+    const H1_RECAP        = 'Récapitulatif ';
+    const CONTRAT         = 'CTT';
+    const PLANNING        = 'Planning semaine ';
+    const PLANNING_TITLE  = 'Planning_Semaine';
+    const DRIVER_PLN      = 'PLN';
+    const IMAGE_EXTENSION = '.png';
 
     /**
      * Create a new controller instance.
@@ -131,31 +133,18 @@ class EmployeeController extends Controller
         $request->endDate   = Carbon::createFromFormat('d/m/Y', $request->endDate)->format('Ymd');
         if($request->endDate - $request->startDate !== 4){return redirect()->back()->with('error', 'Veuillez des dates correctes ! Un lundi et un vendredi doivent être saisis !');}
         $pathToSave = Files::getStoragePath(self::DRIVER_PLN);
+
         foreach($allEmployee as $item){
-            $cmd = "'C://Program Files/Google/Chrome/Application/chrome.exe' --headless --disable-gpu --run-all-compositor-stages-before-draw --print-to-pdf=".$pathToSave."Planning du ".$request->startDate." au ".$request->endDate." ".route('planning.getPlanningOneEmployee',['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]);dd($cmd);
+            $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.$item->id.self::IMAGE_EXTENSION;
+            $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningOneEmployee',['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
             exec($cmd, $output, $code);
-            dd($output, $code);
-            /* $browserFactory = new BrowserFactory();
-            $browser = $browserFactory->createBrowser();
-
-            try{
-                $page = $browser->createPage();
-                $page->navigate(route('planning.getPlanningOneEmployee',
-                    ['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]))
-                    ->waitForNavigation();dd($page);
-                $page->pdf(['printBackground' => false])->saveToFile('/foo/bar.pdf');
-                $browser->close();
-            }catch(OperationTimedOut $e){
-                dd($e);
-                // too long to load
-            }catch(NavigationExpired $e){
-                dd($e);
-                // An other page was loaded
-            } */
-            //Storage::put('public/pdf/invoice.pdf', $pdf->output());
-
-            //$dompdf->save(Files::getStoragePath(self::DRIVER_PLN) . self::PLANNING . $request->startDate . '_' . $request->endDate);
+            if($code == 0){
+                $mail = new EmailController();
+                $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
+                unlink($fullPath);
+            }
         }
+        return redirect()->route('employee.index')->with('success', 'Les plannings ont été envoyés aux employés avec succès !');
     }
 //auto trier sur la colonne donnée, la premiere etant prio, en asc ou en desc² et gére rle type de donnée
 }

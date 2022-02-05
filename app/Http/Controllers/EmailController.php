@@ -14,8 +14,11 @@ class EmailController extends Controller
 {
     const MAIL_N1             = 'MN1';
     const PAGE_N1             = 'mailN1';
+    const PAGE_EMPLOYEE       = 'mailEmployee';
     const TITLE_SEND_PLANNING = 'Votre emploi du temps';
     const TITLE_SEND_TO_N1    = 'Informations employé - Edition d\'un contrat';
+
+    public function __construct(){$this->middleware('auth');}
     // ------------- [ Send email ] --------------------
     public function sendEmailToN1($fkEmployee){
         $request = new Request();
@@ -27,18 +30,20 @@ class EmailController extends Controller
         $collection   = collect(['title' => self::TITLE_SEND_TO_N1, 'view' => self::PAGE_N1]);
         $employeeInfo = $collection->merge($employeeInfo);
 
-        Mail::to(env('MAIL_USERNAME'))->send(new Mailer($this->employeeDecryptor($employeeInfo)));
+        Mail::to([env('MAIL_USERNAME'),paramAdmin::getParamValueByCode(self::MAIL_N1)])->send(new Mailer($this->employeeDecryptor($employeeInfo)));
         return redirect()->route('employee.index')->with('success', 'Email envoyé avec succès !');
     }
 
-    public function sendCalendarToEmployee(){
-        //besoin id employee, mail, nom, et qu'il,soit actif
-        // ensuite foreach mail::to($mail)->send(new Mailer($employeeInfo))
-        // renvoi vers la page du calendar solo, new js avec chargement calendar
+    public function sendCalendarToEmployee($fkEmployee, $filePath, $startDate, $endDate){
+        $employeeInfo = Employee::getEmployeeWithId($fkEmployee);
+        $collection   = collect(['title' => self::TITLE_SEND_PLANNING, 'view' => self::PAGE_EMPLOYEE, 'attachment' => $filePath, 'startDate' => $startDate, 'endDate' => $endDate]);
+        $employeeInfo = $this->employeeDecryptor($collection->merge($employeeInfo));
+
+        Mail::to([env('MAIL_USERNAME'),env('MAIL_USERNAME')/* $employeeInfo['mail'] */])->send(new Mailer($employeeInfo));
     }
 
     public function employeeDecryptor($employee){
-        $employee['birthDate']   = Carbon::createFromFormat('Ymd', $employee['birthDate'])->format('d/m/Y');
+        $employee['birthDate']    = Carbon::createFromFormat('Ymd', $employee['birthDate'])->format('d/m/Y');
         $employee['firstName']    = Crypt::decrypt($employee['firstName']);
         $employee['name']         = Crypt::decrypt($employee['name']);
         $employee['greenNumber']  = Crypt::decrypt($employee['greenNumber']);

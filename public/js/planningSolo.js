@@ -9,6 +9,7 @@ $(function(){
         slotMinTime: '07:00:00',
         slotMaxTime:'18:00:00',
         slotDuration: '00:20:00',
+        initialDate: config.data.start,
         datesAboveResources:true,
         eventDisplay:'block',
         allDaySlot: false,
@@ -20,7 +21,7 @@ $(function(){
             events = [];
             fetch(config.routes.getAllEvents + '?'+ new URLSearchParams({fkEmployee: config.data.fkEmployee ,end: config.data.end, start: config.data.start}), fetchGet())
                 .then(response=>response.json())
-                .then(data => {
+                .then(data => {console.log(data)
                     $.each(data, function(key, value){
                         events.push({
                             id:value.id,

@@ -20,9 +20,9 @@ class Employee extends Model
             return self::whereNull('endDate')->get();
         }
 
-        public static function getEmployeeWithId($fkEmployee):Collection
+        public static function getEmployeeWithId($fkEmployee):Employee
         {
-            return self::where('id', $fkEmployee)->get();
+            return self::find($fkEmployee);
         }
 
         public static function insertEmployee(Request $request):string
