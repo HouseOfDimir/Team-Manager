@@ -28,9 +28,18 @@ class mailer extends Mailable
     public function build()
     {
         $details = $this->details->toArray();
-        if(isset($details['attachment'])){
+
+        if(isset($details['exception'])){
+            return $this->markdown('emails.ErrorReport', $details)
+                ->from(env('MAIL_FROM_ADDRESS'))
+                ->to(env('MAIL_ADMIN'))
+                ->replyTo(env('MAIL_FROM_ADDRESS'))
+                ->subject($this->details['title'])
+                ->priority(3);
+
+        }elseif(isset($details['attachment'])){
             return $this->markdown('emails.EmployeePlanning', $details)
-                ->from(env('MAIL_FROM_ADDRESS'), 'No-reply-'.env('APP_NAME'))
+                ->from(env('MAIL_FROM_ADDRESS'))
                 ->to(env('MAIL_USERNAME'))
                 ->replyTo(env('MAIL_FROM_ADDRESS'))
                 ->subject($this->details['title'])
@@ -39,7 +48,7 @@ class mailer extends Mailable
 
         }else{
             return $this->markdown('emails.EmployeeInformations', $details)
-                ->from(env('MAIL_FROM_ADDRESS'), 'No-reply-'.env('APP_NAME'))
+                ->from(env('MAIL_FROM_ADDRESS'))
                 ->to(env('MAIL_USERNAME'))
                 ->replyTo(env('MAIL_FROM_ADDRESS'))
                 ->subject($this->details['title'])

@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
                         ->get();
         }
 
-        public static function getAllFileByEmployee(int $fkEmployee):Collection
+        public static function getAllFileByEmployee(string $fkEmployee):Collection
         {
             return self::leftJoin('fileType', 'fileType.id', '=', 'fileEmployee.fkFileType')
                         ->whereNull('endDate')->where('fkEmployee', $fkEmployee)

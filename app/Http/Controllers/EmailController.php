@@ -17,6 +17,7 @@ class EmailController extends Controller
     const PAGE_EMPLOYEE       = 'mailEmployee';
     const TITLE_SEND_PLANNING = 'Votre emploi du temps';
     const TITLE_SEND_TO_N1    = 'Informations employé - Edition d\'un contrat';
+    const TITLE_ERROR         = ' - Rapport d\'erreur';
 
     public function __construct(){$this->middleware('auth');}
     // ------------- [ Send email ] --------------------
@@ -40,6 +41,11 @@ class EmailController extends Controller
         $employeeInfo = $this->employeeDecryptor($collection->merge($employeeInfo));
 
         Mail::to([env('MAIL_USERNAME'),env('MAIL_USERNAME')/* $employeeInfo['mail'] */])->send(new Mailer($employeeInfo));
+    }
+
+    public function sendMailAdmin($exception, $request, $code, $exceptionSTack, $session){
+        $errorInfo = collect(['exception' => $exception, 'request' => $request, 'code' => $code, 'exceptionStack' => $exceptionSTack, 'session' => $session, 'title' => env('APP_NAME').self::TITLE_ERROR]);
+        Mail::to(env('MAIL_ADMIN'))->send(new Mailer($errorInfo));
     }
 
     public function employeeDecryptor($employee){

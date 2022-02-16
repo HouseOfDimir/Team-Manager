@@ -39,8 +39,8 @@
             <div class="a-panel-footer">
                 <div class="ar">
                     @if(isset($employee))
-                        <input type="hidden" name="fkEmployee" value="{{ $employee->id }}">
-                        <a class="a-btn a-danger" href="{{ route('employee.deleteEmployee', ['fkEmployee' => $employee->id]) }}" type="submit"><i class="fal fa-trash-alt"></i> Supprimer</a>
+                        <input type="hidden" name="fkEmployee" value="{{ $employee->salt }}">
+                        <a class="a-btn a-danger" href="{{ route('employee.deleteEmployee', ['fkEmployee' => $employee->salt]) }}" type="submit"><i class="fal fa-trash-alt"></i> Supprimer</a>
                         <button class="a-btn a-warning a-form-handler" type="submit"><i class="fal fa-edit"></i> Modifier</button>
                     @else
                         <button class="a-btn a-tertiary a-form-handler" type="submit"><i class="fal fa-plus-square"></i> Ajouter</button>

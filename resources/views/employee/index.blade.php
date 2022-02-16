@@ -89,8 +89,8 @@
 
                                     @if(isset($employee->fileEmployee) && filled($employee->fileEmployee))
                                         @foreach($employee->fileEmployee as $file)
-                                            <div class="col-md-12">
-                                                <a href="{{ route('file.download', ['fkFile' => $file->id]) }}" class="small-link"><i class="fas fa-paperclip"></i>Télécharger {{ $file->libelle }}</a>
+                                            <div class="col-md-12 center">
+                                                <a href="{{ route('file.download', ['fkFile' => $file->id]) }}" class="small-link"><i class="fas fa-paperclip"></i>{{ $file->libelle }}</a>
                                                 <a target="_blank" rel="noopener noreferrer" class="small-link" href="{{ route('file.display', ['fkFile' => $file->id]) }}"><i class="far fa-eye"></i></a>
                                             </div>
                                         @endforeach

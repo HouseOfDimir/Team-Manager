@@ -81,7 +81,7 @@ class Employee extends Model
             })->count();
         }
 
-        public static function countByMailAndPhoneById(string $phone, string $mail, int $fkEmployee):int
+        public static function countByMailAndPhoneById(string $phone, string $mail, string $fkEmployee):int
         {
             return self::whereNull('endDate')
                         ->where('id', '<>', $fkEmployee)->where(function($query) use ($phone, $mail){

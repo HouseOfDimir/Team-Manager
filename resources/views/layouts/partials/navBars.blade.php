@@ -20,6 +20,12 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{{ route('task.index') }}"><i class="fas fa-door-open"></i> Tâches</a></li>
                     <li><a class="dropdown-item" href="{{ route('contract.index') }}"><i class="far fa-eye"></i> Contrats</a></li>
+                    <li>
+                        <a href="{{ route('task.administration') }}" class="dropdown-item">
+                            <i class="fad fa-cogs"></i>
+                            Administration
+                        </a>
+                    </li>
                 </ul>
             </li>
 
@@ -34,6 +40,11 @@
     <!----------------------------- RIGHT COMPONENT ----------------------------------------->
     <div class="nav-right-part flex-center">
         <ul class="navbar-nav flex-center">
+            <li class="nav-item">
+                <a class="nav-link" style="padding: 0.9rem !important" href="#">
+                    Accès à GaLi
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" style="padding: 0.9rem !important" href="#">
                     {{ config('app.editor') }}

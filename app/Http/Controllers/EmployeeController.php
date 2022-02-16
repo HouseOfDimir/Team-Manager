@@ -33,6 +33,7 @@ class EmployeeController extends Controller
     public function execute(){
         $allEmployee = Employee::getAllEmployee();
         foreach($allEmployee as &$employee){
+            $employee['fileEmployee'] = fileEmployee::getAllFileByEmployee($employee->salt);
             $this->employeeDecryptor($employee);
         }
 
@@ -62,26 +63,28 @@ class EmployeeController extends Controller
 
     public function createEmployee(Request $request){
         $this->validate($request, [
-            'name'        => 'required|string',
-            'firstName'   => 'required|string',
-            'city'        => 'required|string',
-            'birthPlace'  => 'required|string',
+            'name'        => 'required|string|regex:/[a-zA-Z]+/',
+            'firstName'   => 'required|string|regex:/[a-zA-Z]+/',
+            'city'        => 'required|string|regex:/[a-zA-Z]+/',
+            'birthPlace'  => 'required|string|regex:/[a-zA-Z]+/',
             'birthDate'   => 'required|string',
             'adress'      => 'required|string',
             'mail'        => 'required|string',
             'greenNumber' => 'required|string|max:15|regex:/[0-9]{15}/',
             'phone'       => 'required|string|regex:/(0)[0-9]{9}/',
-            'fkEmployee'  => 'nullable|int|exists:\database\Models\Employee,salt',
+            'fkEmployee'  => 'nullable|string|exists:\database\Models\Employee,salt',
             'zipCode'     => 'required|string|regex:/[0-9]{5}/'
         ]);
 
         if($request->filled('fkEmployee')){
             if(Employee::countByMailAndPhoneById($request->phone, $request->mail, $request->fkEmployee)){return redirect()->back()->with('error', 'Une erreur est survenue, le numéro de téléphone ou le mail existent déjà !');}
+            $message = ['success' => 'Informations employé modifiées avec succcès !'];
+            $request->fkEmployee = Crypt::decrypt($request->fkEmployee);
         }else{
             $request->flash();
             if(Employee::countByMailAndPhone($request->phone, $request->mail)){ return redirect()->back()->with('error', 'Une erreur est survenue, le numéro de téléphone ou le mail existent déjà !');}
+            $message = ['success' => 'Employé ajouté avec succcès !'];
         }
-
         $fkEmployee = Employee::insertEmployee($request);
 
         if(filled($request->file())){
@@ -89,10 +92,10 @@ class EmployeeController extends Controller
                 FileController::insertFileEmployee($request, $fkEmployee, $key, $file);
             }
 
-            return redirect()->route('employee.toModifyEmployee', ['fkEmployee' => $fkEmployee])->with('success', 'Informations employé modifiées avec succcès !');
+            return redirect()->route('employee.toModifyEmployee', ['fkEmployee' => $fkEmployee])->with($message);
 
         }else{
-            return redirect()->route('employee.toModifyEmployee', ['fkEmployee' => $fkEmployee])->with('success', 'Informations employé modifiées avec succcès !');
+            return redirect()->route('employee.toModifyEmployee', ['fkEmployee' => $fkEmployee])->with($message);
         }
     }
 

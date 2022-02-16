@@ -52,6 +52,7 @@
                                 Tâches
                             </a>
                         </li>
+                        <li><a class="card-link" href="{{ route('contract.index') }}"><i class="far fa-eye"></i> Contrats</a></li>
                         <li>
                             <a href="{{ route('task.administration') }}" class="card-link">
                                 <i class="fad fa-cogs"></i>
