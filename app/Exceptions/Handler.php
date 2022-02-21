@@ -90,6 +90,7 @@ class Handler extends ExceptionHandler
         if ($this->isHttpException($exception)) {
             switch($exception->getStatusCode()){
                 case 404 :
+                    $this->sendMailAdmin($request, $exception, $exception->getStatusCode());
                     return response()->view('errors.' . 'errors404', [], 404);
                     break;
                 case 408 :
@@ -128,11 +129,11 @@ class Handler extends ExceptionHandler
             if($exception instanceof $dontRender){return;}
         }
 
-        if(env('APP_PRODUCTION')){
+        //if(env('APP_PRODUCTION')){
             //$mail = new AppMail();
             $mail = new EmailController();
-            $mail->sendMailAdmin($exception, $request, $code, $this::STACK_EXCEPTION, isset($request->session()->all()[env('APP_NAME')]) ? $request->session()->all()[env('APP_NAME')] : array('Out Of Session' => 'Aucune donnée de session'));
-            $mail->setTransmitter(env('MAIL_FROM_ADDRESS'));
+            $mail->sendMailAdmin($exception, $request, $code, $this::STACK_EXCEPTION, $request->session() ?? array('Out Of Session' => 'Aucune donnée de session'));
+            /* $mail->setTransmitter(env('MAIL_FROM_ADDRESS'));
             $mail->setReceiver(env('MAIL_ADMIN'));
             $mail->setSubject(env('APP_NAME') . ' - Error report');
             $mail->setTextMessage(view('Email.ErrorException')
@@ -142,7 +143,7 @@ class Handler extends ExceptionHandler
                 ->with('stackException', $this::STACK_EXCEPTION)
                 ->with('sessionApp', isset($request->session()->all()[env('APP_NAME')]) ? $request->session()->all()[env('APP_NAME')] : array('Out Of Session' => 'Aucune donnée de session') )
                 ->render());
-            $mail->send();
-        }
+            $mail->send(); */
+        //}
     }
 }

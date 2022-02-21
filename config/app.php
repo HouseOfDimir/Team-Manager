@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'Team-Manager'),
 
-    'editor' => 'Connected Company, Copyright 2021',
+    'editor' => 'Connected Company',
 
     /*
     |--------------------------------------------------------------------------

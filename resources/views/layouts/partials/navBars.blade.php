@@ -47,7 +47,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" style="padding: 0.9rem !important" href="#">
-                    {{ config('app.editor') }}
+                    {{ date('Y') . ' ' .config('app.editor') }} All rights reserved
                 </a>
             </li>
             <li class="nav-item">

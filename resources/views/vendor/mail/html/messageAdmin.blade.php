@@ -9,10 +9,7 @@
 {{-- Body --}}
 
 {{ $slot }}
-{{-- @component('mail::panel', ['title'       => $title,
-'firstName'   => $firstName,
-'name'        => $name
-]) --}}
+
 
 @endcomponent
 
@@ -29,6 +26,6 @@
 @slot('footer')
 @component('mail::footer')
 © {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.')
+
 @endcomponent
 @endslot
-@endcomponent
