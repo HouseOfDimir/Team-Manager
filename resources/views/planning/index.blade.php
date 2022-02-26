@@ -6,21 +6,23 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-2">
                     <div class="a-panel a-panel-warning a-box-shadow">
-                        <div class="a-panel-header">Tâches droppables</div>
+                        <div class="a-panel-header">Tâches</div>
                         <div class="a-panel-content">
-                            <div id="external-events" class="row center">
-                                @foreach ($alltask as $task)
-                                    <div class="external-event col-md-3" id="task_{{ $task->id }}" style="background-color:{{ $task->color }};color:{{ $task->letterColor }}">{{ $task->libelle }}</div>
-                                @endforeach
+                            <div class="center">
+                                <div class="row" id="external-events">
+                                    @foreach ($alltask as $task)
+                                        <div class="external-event col-md-10" id="task_{{ $task->id }}" style="background-color:{{ $task->color }};color:{{ $task->letterColor }}">{{ $task->libelle }}</div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- /.col -->
-                <div class="col-md-12">
+                <div class="col-md-10">
                     <div id="calendar" class="a-box-shadow"></div>
             </div><!-- /.container-fluid -->
         </div>

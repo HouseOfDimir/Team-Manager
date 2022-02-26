@@ -10,16 +10,16 @@
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle listeBouton" data-toggle="dropdown" role="button">Employés<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ route('employee.index') }}"><i class="fas fa-door-open"></i> Liste employés</a></li>
-                    <li><a class="dropdown-item" href="{{ route('employee.creationEmployee') }}"><i class="far fa-eye"></i> Ajout employés</a></li>
+                    <li><a class="dropdown-item" href="{{ route('employee.index') }}"><i class="fad fa-users"></i> Liste employés</a></li>
+                    <li><a class="dropdown-item" href="{{ route('employee.creationEmployee') }}"><i class="fad fa-keyboard"></i> Ajout employés</a></li>
                 </ul>
             </li>
 
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle listeBouton" data-toggle="dropdown" role="button">Administration<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ route('task.index') }}"><i class="fas fa-door-open"></i> Tâches</a></li>
-                    <li><a class="dropdown-item" href="{{ route('contract.index') }}"><i class="far fa-eye"></i> Contrats</a></li>
+                    <li><a class="dropdown-item" href="{{ route('task.index') }}"><i class="fad fa-tasks"></i> Tâches</a></li>
+                    <li><a class="dropdown-item" href="{{ route('contract.index') }}"><i class="fad fa-file-contract"></i> Contrats</a></li>
                     <li>
                         <a href="{{ route('task.administration') }}" class="dropdown-item">
                             <i class="fad fa-cogs"></i>
@@ -46,7 +46,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" style="padding: 0.9rem !important" href="#">
+                <a class="nav-link" style="padding: 0.9rem !important" href="mailto:{{ env('MAIL_ADMIN') }}">
                     {{ date('Y') . ' ' .config('app.editor') }} All rights reserved
                 </a>
             </li>

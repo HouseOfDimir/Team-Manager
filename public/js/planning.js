@@ -99,7 +99,7 @@ $(function(){
                     successCallback(resources)
                 })
         },
-        eventReceive:function(info){
+        eventReceive:function(info){console.log(info)
             var end       = moment(info.event._instance.range.end).subtract(1, 'h')
             var eventData = {
                 start     : moment(info.event.start).format("YYYY-MM-DD HH-mm"),
@@ -112,6 +112,13 @@ $(function(){
             fetch(config.routes.addEvent, fetchPost(eventData))
             .then(response=>response.json())
                     .then(data => {
+                        console.log(calendar.getEvents());
+                        $.each(calendar.getEvents(), function(key, value){
+                            if(value._def.publicId == ''){
+                                value._def.publicId = data.event.id.toString();
+                                value.id = data.event.id.toString();
+                            }
+                        });
                         $.atomNotify(data.feedback, data.style)
                     })
                     .catch(function(error){
@@ -124,7 +131,8 @@ $(function(){
                 type   : config.modelFunc.delete,
                 fkEvent: event.event.id
             }
-            calendar.getEventById(event.event.id).remove()
+            console.log(event.event)
+            calendar.getEventById(event.event.id).remove();
             fetch(config.routes.addEvent, fetchPost(eventData))
                 .then(response=>response.json())
                 .then(data => {
@@ -146,6 +154,7 @@ $(function(){
             fetch(config.routes.addEvent, fetchPost(eventData))
                 .then(response=>response.json())
                 .then(data => {
+                    console.log(data)
                     $.atomNotify(data.feedback, data.style)
                 })
                 .catch(function(error){
@@ -155,6 +164,10 @@ $(function(){
     })
     calendar.render()
 })
+
+function eventRenderer(data){
+    calendar.renderEvent(data, true);
+}
 
 function fetchPost(datas){
     return {

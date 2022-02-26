@@ -44,29 +44,23 @@ class PlanningController extends Controller
 
     public function ajaxTourbi(Request $request)
     {
-        switch ($request->type) {
+        switch($request->type){
             case config('app.switch.add'):
-                if(planning::insertEvent($request)){
-                    return response()->json(['style' => 'success', 'feedback' => 'Evènement ajouté avec succès !']);
-                }else{
-                    return response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
-                }
+                $event = planning::insertEvent($request);
+                    return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement ajouté avec succès !', 'event' => $event])
+                    : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
 
             case config('app.switch.update'):
-                if(planning::updateEvent($request)){
-                    return response()->json(['style' => 'info', 'feedback' => 'Evènement modifié avec succès !']);
-                }else{
-                    return response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
-                }
+                $event = planning::updateEvent($request);
+                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement modifié avec succès !', 'event' => $event])
+                : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
 
             case config('app.switch.delete'):
-                if(planning::deleteEvent($request)){
-                    return response()->json(['style' => 'info', 'feedback' => 'Evènement supprimé avec succès !']);
-                }else{
-                    return response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
-                }
+                $event = planning::deleteEvent($request);
+                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement supprimé avec succès !', 'event' => $event])
+                : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
         }
     }

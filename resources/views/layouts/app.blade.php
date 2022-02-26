@@ -46,7 +46,7 @@
     <div id="app">
         @include('layouts.partials.navBars')
 
-        <main class="container" @if(isset($fullScreen))style="min-width: 100%;"@endif>
+        <main class="container" {{-- @if(isset($fullScreen))style="min-width: 100%;"@endif --}}>
             @yield('content')
         </main>
     </div>

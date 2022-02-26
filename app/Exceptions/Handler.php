@@ -129,21 +129,9 @@ class Handler extends ExceptionHandler
             if($exception instanceof $dontRender){return;}
         }
 
-        //if(env('APP_PRODUCTION')){
-            //$mail = new AppMail();
+        if(env('APP_PRODUCTION')){
             $mail = new EmailController();
             $mail->sendMailAdmin($exception, $request, $code, $this::STACK_EXCEPTION, $request->session() ?? array('Out Of Session' => 'Aucune donnée de session'));
-            /* $mail->setTransmitter(env('MAIL_FROM_ADDRESS'));
-            $mail->setReceiver(env('MAIL_ADMIN'));
-            $mail->setSubject(env('APP_NAME') . ' - Error report');
-            $mail->setTextMessage(view('Email.ErrorException')
-                ->with('exception', $exception)
-                ->with('session', $request)
-                ->with('code', $code)
-                ->with('stackException', $this::STACK_EXCEPTION)
-                ->with('sessionApp', isset($request->session()->all()[env('APP_NAME')]) ? $request->session()->all()[env('APP_NAME')] : array('Out Of Session' => 'Aucune donnée de session') )
-                ->render());
-            $mail->send(); */
-        //}
+        }
     }
 }
