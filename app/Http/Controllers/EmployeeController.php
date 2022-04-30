@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use HeadlessChromium\BrowserFactory;
 use Illuminate\Support\Facades\Storage;
+use Models\planningType;
 
 class EmployeeController extends Controller
 {
@@ -22,6 +23,7 @@ class EmployeeController extends Controller
     const PLANNING_TITLE  = 'Planning_Semaine';
     const DRIVER_PLN      = 'PLN';
     const IMAGE_EXTENSION = '.png';
+    const PLANNING_EQUIPE = 'équipe';
 
     /**
      * Create a new controller instance.
@@ -37,8 +39,9 @@ class EmployeeController extends Controller
             $this->employeeDecryptor($employee);
         }
 
-        return view('employee.index')->with(['allEmployee'   => $allEmployee,
-                                             'inputEmployee' => inputEmployee::getAllInputEmployee()]);
+        return view('employee.index')->with(['allEmployee'     => $allEmployee,
+                                             'allPlanningType' => planningType::getAllPlanning(),
+                                             'inputEmployee'   => inputEmployee::getAllInputEmployee()]);
     }
 
     public function creationEmployee(){
@@ -130,23 +133,40 @@ class EmployeeController extends Controller
         return $employee;
     }
 
-    public function createPDFandSendToMail(Request $request){
-        $allEmployee        = Employee::getAllEmployee();
+    public function createPDFandSendToMail(Request $request){//dd($request);
+        //$allEmployee        = Employee::getAllEmployee();
+
         $request->startDate = Carbon::createFromFormat('d/m/Y', $request->startDate)->format('Ymd');
         $request->endDate   = Carbon::createFromFormat('d/m/Y', $request->endDate)->format('Ymd');
         if($request->endDate - $request->startDate !== 4){return redirect()->back()->with('error', 'Veuillez des dates correctes ! Un lundi et un vendredi doivent être saisis !');}
         $pathToSave = Files::getStoragePath(self::DRIVER_PLN);
 
-        foreach($allEmployee as $item){
-            $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.$item->id.self::IMAGE_EXTENSION;
-            $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningOneEmployee',['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
+        if(planningType::getGlobalById($request->planningType)){
+            $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.self::PLANNING_EQUIPE.self::IMAGE_EXTENSION;
+            $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningGlobal',['startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
             exec($cmd, $output, $code);
-            if($code == 0){
-                $mail = new EmailController();
-                $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
-                unlink($fullPath);
+
+            foreach($request->fkEmployee as $item){
+                if($code == 0){
+                    $mail = new EmailController();
+                    $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
+                }
+            }
+            unlink($fullPath);
+
+        }else{dd('ko');
+            foreach($request->fkEmployee as $item){
+                $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.$item->id.self::IMAGE_EXTENSION;
+                $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningOneEmployee',['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
+                exec($cmd, $output, $code);
+                if($code == 0){
+                    $mail = new EmailController();
+                    $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
+                    unlink($fullPath);
+                }
             }
         }
+
         return redirect()->route('employee.index')->with('success', 'Les plannings ont été envoyés aux employés avec succès !');
     }
 //auto trier sur la colonne donnée, la premiere etant prio, en asc ou en desc² et gére rle type de donnée

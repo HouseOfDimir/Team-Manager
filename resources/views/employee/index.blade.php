@@ -10,7 +10,7 @@
                 <div class="a-panel a-panel-warning a-box-shadow">
                     <div class="a-panel-header">Panel envoi de plannings</div>
                     <div class="a-panel-content">
-                        <form method="POST" action="{{ route('employee.planningAndMail') }}">
+                        <form method="POST" action="{{ route('employee.planningAndMail') }}" novalidate>
                             @csrf
                             <div class="row">
                                 <div class="col-md-6 col-md-offset-1 a-input-group">
@@ -21,9 +21,29 @@
                                     <input class="a-input verifyDate" name="endDate" value=""/>
                                     <label><i class="fad fa-hourglass-end"></i> Fin de semaine</label>
                                 </div>
+                                <div class="col-md-6 col-md-offset-1 a-input-group">
+                                    <select class="a-input verifySelect" required name="planningType">
+                                        <option value="" disabled selected>Sélectionnez un planning</option>
+                                        @foreach ($allPlanningType as $planning)
+                                            <option value="{{ $planning->id }}">{{ $planning->libelle }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label><i class="fad fa-user"></i> Type de planning</label>
+                                </div>
+                                <div class="col-md-12">
+                                    <label><i class="fad fa-user"></i> Employé(e)s</label>
+                                    <div class="row">
+                                        @foreach ($allEmployee as $employee)
+                                            <div class="col-md-3 col-md-offset-1 a-input-group">
+                                                <label><input type="checkbox" class="a-check" value="{{ $employee->id }}" name="fkEmployee[]"><span class="a-btn a-info" role="button" >{{ $employee->name . ' ' . $employee->firstName }}</span></label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                </div>
                             </div>
                             <div class="ar">
-                                <button class="a-btn a-info" type="submit"><i class="fal fa-paper-plane"></i> Envoyer</button>
+                                <button class="a-btn a-info a-form-handler" type="submit"><i class="fal fa-paper-plane"></i> Envoyer</button>
                             </div>
                         </form>
                     </div>

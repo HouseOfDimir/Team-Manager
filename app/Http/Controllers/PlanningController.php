@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use database\Models\Employee;
+use database\Models\paramAdmin;
+use database\Models\paramAdminInitialView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Models\planning;
@@ -11,6 +13,9 @@ use Illuminate\Support\Carbon;
 
 class PlanningController extends Controller
 {
+    const PLANNING_OPTION = 1;
+    const INITIAL_VIEW    = 'initialView';
+    const WEEKENDS        = 'weekends';
     /**
      * Create a new controller instance.
      *
@@ -28,9 +33,19 @@ class PlanningController extends Controller
      */
     public function execute()
     {
-        return view('planning.index')->with(['alltask'     => Task::getAllTasks(),
-                                             'allEmployee' => Employee::getAllEmployee(),
-                                             'fullScreen'  => 1]);
+        $paramPlanning = paramAdmin::getParamPlanning(self::PLANNING_OPTION);
+        foreach($paramPlanning as $key => &$value){
+            if($key == self::INITIAL_VIEW){
+                $value['valeur'] = paramAdminInitialView::getInitialViewById($value['valeur']);
+            }elseif($key == self::WEEKENDS){
+                $value['valeur'] = $value['valeur'] == 0 ? false : true;
+            }
+        }
+
+        return view('planning.index')->with(['alltask'       => Task::getAllTasks(),
+                                             'allEmployee'   => Employee::getAllEmployee(),
+                                             'paramPlanning' => $paramPlanning,
+                                             'fullScreen'    => 1]);
     }
 
     public function getWeekIndex(Request $request)
@@ -82,6 +97,17 @@ class PlanningController extends Controller
         return view('planning.personalPlanning')->with(
             [
                 'id'              => $fkEmployee,
+                'startDate'       => $startDate,
+                'endDate'         => $endDate,
+                'formatedStDate'  => \Carbon\Carbon::createFromFormat('Ymd', $startDate)->format('d/m/Y'),
+                'formatedEndDate' => \Carbon\Carbon::createFromFormat('Ymd', $endDate)->format('d/m/Y')
+            ]
+        );
+    }
+
+    public function getPlanningGlobal($startDate, $endDate){
+        return view('planning.globalPlanning')->with(
+            [
                 'startDate'       => $startDate,
                 'endDate'         => $endDate,
                 'formatedStDate'  => \Carbon\Carbon::createFromFormat('Ymd', $startDate)->format('d/m/Y'),

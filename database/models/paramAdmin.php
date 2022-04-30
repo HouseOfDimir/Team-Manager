@@ -26,6 +26,14 @@ use Illuminate\Database\Eloquent\{Model, Collection};
         {
             return self::where('code', $code)->value('valeur');
         }
+
+        public static function getParamPlanning($paramPlanning){
+            return self::whereNull('endDate')
+                        ->where('planning', $paramPlanning)
+                        ->select('code', 'valeur')
+                        ->get()->keyBy('code')
+                        ->toArray();
+        }
     }
 // FILES COULD BE FACTURES ENERGIE, TELEPHONE, INTERNET, RIB, IBAN, CONTRAT (CEE CDD CDI)
 ?>

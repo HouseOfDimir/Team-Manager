@@ -4,17 +4,35 @@
     <h1>Planning</h1>
     @include('partials._message')
 
-        <div class="container-fluid">
+        {{-- <div class="container-fluid"> --}}
             <div class="row">
                 <div class="col-md-2">
-                    <div class="a-panel a-panel-warning a-box-shadow">
-                        <div class="a-panel-header">Tâches</div>
-                        <div class="a-panel-content">
-                            <div class="center">
-                                <div class="row" id="external-events">
-                                    @foreach ($alltask as $task)
-                                        <div class="external-event col-md-10" id="task_{{ $task->id }}" style="background-color:{{ $task->color }};color:{{ $task->letterColor }}">{{ $task->libelle }}</div>
-                                    @endforeach
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="a-panel a-panel-warning a-box-shadow">
+                                <div class="a-panel-header">Aller à la date</div>
+                                <div class="a-panel-content">
+                                    <div class="col-md-12 col-md-offset-1 a-input-group">
+                                        <input class="a-input verifyDate" name="startDate" value=""/>
+                                        <label><i class="fad fa-hourglass-start"></i></label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button class="a-btn a-info goToDate"><i class="fal fa-paper-plane"></i> Aller</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="a-panel a-panel-warning a-box-shadow">
+                                <div class="a-panel-header">Tâches</div>
+                                <div class="a-panel-content">
+                                    <div class="">
+                                        <div class="row" id="external-events">
+                                            @foreach ($alltask as $task)
+                                                <div class="external-event col-md-10" id="task_{{ $task->id }}" style="background-color:{{ $task->color }};color:{{ $task->letterColor }}">{{ $task->libelle }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -25,7 +43,7 @@
                 <div class="col-md-10">
                     <div id="calendar" class="a-box-shadow"></div>
             </div><!-- /.container-fluid -->
-        </div>
+        {{-- </div> --}}
 @stop
 
 @section('addCalendar')
@@ -43,6 +61,9 @@
                     add: '{{ config('app.switch.add') }}',
                     update: '{{ config('app.switch.update') }}',
                     delete: '{{ config('app.switch.delete') }}',
+                },
+                params: {
+                    param: @json($paramPlanning)
                 }
             }
     </script>

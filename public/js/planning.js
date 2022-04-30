@@ -1,4 +1,18 @@
-$(function(){
+$(function(){ console.log(config.params.param.initialView.valeur)
+    /* $('.verifyDate').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'fr-FR,',
+        autoclose: true,
+        setDate: new Date(),
+        daysOfWeekDisabled:[0,6],
+        daysOfWeekHighlighted:[1,5]
+    }); */
+
+    $('.goToDate').on('click', function(){
+        var darr = $('.verifyDate').val().split('/');
+        var dobj = new Date(darr[2], darr[1] -1, darr[0]).toISOString();console.log(dobj)
+        calendar.gotoDate(dobj);
+    });
     /* initialize the external events
      -----------------------------------------------------------------*/
     function ini_events(ele) {
@@ -53,12 +67,12 @@ $(function(){
             right : 'resourceTimeGridWeek,resourceTimeGridDay'
         },
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-        initialView: 'resourceTimeGrid',
+        initialView: config.params.param.initialView.valeur,
         refetchResourcesOnNavigate:true,
-        slotMinTime: '07:00:00',
-        slotMaxTime:'18:00:00',
-        slotDuration: '00:15:00',
-        weekends:false,
+        slotMinTime: config.params.param.slotMinTime.valeur,
+        slotMaxTime: config.params.param.slotMaxTime.valeur,
+        slotDuration: config.params.param.slotDuration.valeur,
+        weekends: config.params.param.weekends.valeur,
         datesAboveResources:true,
         eventDisplay:'block',
         allDaySlot: false,
@@ -75,7 +89,8 @@ $(function(){
                             id:value.id,
                             resourceId:value.resourceId,
                             title:value.title,
-                            color:value.color,
+                            textColor:value.color,
+                            borderColor:value.backgroundColor,
                             backgroundColor:value.backgroundColor,
                             start:value.start,
                             end:value.end,
@@ -99,7 +114,7 @@ $(function(){
                     successCallback(resources)
                 })
         },
-        eventReceive:function(info){console.log(info)
+        eventReceive:function(info){
             var end       = moment(info.event._instance.range.end).subtract(1, 'h')
             var eventData = {
                 start     : moment(info.event.start).format("YYYY-MM-DD HH-mm"),
@@ -127,20 +142,22 @@ $(function(){
 
         },
         eventClick: function(event){
-            eventData = {
-                type   : config.modelFunc.delete,
-                fkEvent: event.event.id
-            }
-            console.log(event.event)
-            calendar.getEventById(event.event.id).remove();
-            fetch(config.routes.addEvent, fetchPost(eventData))
-                .then(response=>response.json())
-                .then(data => {
-                    $.atomNotify(data.feedback, data.style)
-                })
-                .catch(function(error){
-                    $.atomNotify(error)
-                })
+            event.el.addEventListener('click', function(){
+                eventData = {
+                    type   : config.modelFunc.delete,
+                    fkEvent: event.event.id
+                }
+
+                calendar.getEventById(event.event.id).remove();
+                fetch(config.routes.addEvent, fetchPost(eventData))
+                    .then(response=>response.json())
+                    .then(data => {
+                        $.atomNotify(data.feedback, data.style)
+                    })
+                    .catch(function(error){
+                        $.atomNotify(error)
+                    })
+            });
         },
         eventChange: function(changeInfo){
             var eventData = {
@@ -164,10 +181,6 @@ $(function(){
     })
     calendar.render()
 })
-
-function eventRenderer(data){
-    calendar.renderEvent(data, true);
-}
 
 function fetchPost(datas){
     return {

@@ -62,6 +62,7 @@ Route::group(['prefix' => 'planning'], function(){
     Route::post('/delete','PlanningController@ajaxTourbi')->name('planning.delete');
     Route::post('/getAllEmployee', 'PlanningController@getAllEmployee')->name('planning.getAllEmployee');
     Route::get('/getPlanningOneEmployee/{fkEmployee}/{startDate}/{endDate}', 'PlanningController@getPlanningOneEmployee')->name('planning.getPlanningOneEmployee')->withoutMiddleware(['auth']);
+    Route::get('/getPlanningGlobal/{startDate}/{endDate}', 'PlanningController@getPlanningGlobal')->name('planning.getPlanningGlobal')->withoutMiddleware(['auth']);
     //Route::post('/getAllEvents', 'PlanningController@getAllEvents')->name('planning.getAllEvents');
 });
 

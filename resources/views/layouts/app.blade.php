@@ -16,10 +16,11 @@
        <script src="{{ env('DIRLIB') }}AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
        <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomFiles.min.js"></script>
        <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomCollapse.min.js"></script>
-       <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomFormHandler.min.js"></script>
+       <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomFormHandler.js"></script>
        <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomShuffle.min.js"></script>
        <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomSpinner.min.js"></script>
        <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomNotify.min.js"></script>
+       <script src="{{ env('DIRLIB') }}atom/v1.0/js/atomDatatable.min.js"></script>
        <script src="{{ env('DIRLIB') }}bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
        <script src="{{ env('DIRLIB') }}bootstrap-datepicker/dist/locales/bootstrap-datepicker.fr.min.js"></script>
        {{-- <script src="{{ env('DIRLIB') }}atom/v1.0/css/bootstrap.bundle.min.js"></script> --}}

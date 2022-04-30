@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use database\Models\letterColor;
 use database\Models\paramAdmin;
+use database\Models\paramAdminInitialView;
 use Illuminate\Http\Request;
 use Models\Task;
 
@@ -35,11 +36,33 @@ class TaskController extends Controller
     }
 
     public function administration(){
-        return view('task.administration')->with(['paramAdmin' => paramAdmin::getAllParamAdmin(),
-                                                  'route'      => route('task.editParamAdmin')]);
+        $paramAdmin         = paramAdmin::getAllParamAdmin();
+        $paramAdminOther    = [];
+        $paramAdminPlanning = [];
+
+        foreach($paramAdmin as $item){
+            if($item->planning){
+                $paramAdminPlanning[] = $item;
+            }else{
+                $paramAdminOther[] = $item;
+            }
+        }
+
+        return view('task.administration')->with(['paramAdmin'         => $paramAdminOther,
+                                                  'paramAdminPlanning' => $paramAdminPlanning,
+                                                  'initialView'        => paramAdminInitialView::getAllInitialView(),
+                                                  'route'              => route('task.editParamAdmin')]);
     }
 
     public function editParamAdmin(Request $request){
+        $this->validate($request, [
+            'weekends'     => 'required|bool',
+            'initialView'  => 'required|int|exists:planningParamInitialView,id',
+            'slotMinTime'  => 'required|date_format:H:i:s',
+            'slotMaxTime'  => 'required|date_format:H:i:s',
+            'slotDuration' => 'required|date_format:H:i:s'
+        ]);
+
         foreach($request->except('_token') as $key => $value){
             paramAdmin::insertBulkAdmin($key, $value);
         }
