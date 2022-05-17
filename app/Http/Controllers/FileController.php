@@ -17,7 +17,7 @@ class FileController extends Controller
     public function __construct(){$this->middleware('auth');}
 
     public static function insertFileEmployee($request, $fkEmployee, $key, $file){
-        $hashName = Files::loadFile($request, $key, fileType::getCodeFileTypeById($key));
+        $hashName = Files::loadFile($request, $key, fileType::getCodeFileTypeById($key));//dd($hashName, $request, $fkEmployee, $key, $file);
         fileEmployee::insertFileEmployee($fkEmployee, $key, $file->getClientOriginalName(), $hashName);
     }
 

@@ -9,12 +9,13 @@
 {{-- Body --}}
 
 {{ $slot }}
+
 {{-- @component('mail::panel', ['title'       => $title,
 'firstName'   => $firstName,
 'name'        => $name
-]) --}}
+])
 
-@endcomponent
+@endcomponent --}}
 
 {{-- Subcopy --}}
 @isset($subcopy)

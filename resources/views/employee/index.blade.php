@@ -13,15 +13,15 @@
                         <form method="POST" action="{{ route('employee.planningAndMail') }}" novalidate>
                             @csrf
                             <div class="row">
-                                <div class="col-md-6 col-md-offset-1 a-input-group">
+                                <div class="col-md-4 col-md-offset-1 a-input-group">
                                     <input class="a-input verifyDate" name="startDate" value=""/>
                                     <label><i class="fad fa-hourglass-start"></i> Début de semaine</label>
                                 </div>
-                                <div class="col-md-6 col-md-offset-1 a-input-group">
+                                <div class="col-md-4 col-md-offset-1 a-input-group">
                                     <input class="a-input verifyDate" name="endDate" value=""/>
                                     <label><i class="fad fa-hourglass-end"></i> Fin de semaine</label>
                                 </div>
-                                <div class="col-md-6 col-md-offset-1 a-input-group">
+                                <div class="col-md-4 col-md-offset-1 a-input-group">
                                     <select class="a-input verifySelect" required name="planningType">
                                         <option value="" disabled selected>Sélectionnez un planning</option>
                                         @foreach ($allPlanningType as $planning)

@@ -37,10 +37,10 @@ class EmailController extends Controller
 
     public function sendCalendarToEmployee($fkEmployee, $filePath, $startDate, $endDate){
         $employeeInfo = Employee::getEmployeeWithId($fkEmployee);
-        $collection   = collect(['title' => self::TITLE_SEND_PLANNING, 'view' => self::PAGE_EMPLOYEE, 'attachment' => $filePath, 'startDate' => $startDate, 'endDate' => $endDate]);
+        $collection   = collect(['title' => self::TITLE_SEND_PLANNING, 'view' => self::PAGE_EMPLOYEE, 'attachment' => $filePath, 'dateDebut' => $startDate, 'dateFin' => $endDate]);
         $employeeInfo = $this->employeeDecryptor($collection->merge($employeeInfo));
 
-        Mail::to([env('MAIL_USERNAME'),env('MAIL_USERNAME')/* $employeeInfo['mail'] */])->send(new Mailer($employeeInfo));
+        Mail::to([env('MAIL_USERNAME'),$employeeInfo['mail']])->send(new Mailer($employeeInfo));
     }
 
     public function sendMailAdmin($exception, $request, $code, $exceptionSTack, $session){

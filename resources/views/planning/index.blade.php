@@ -27,7 +27,7 @@
                                 <div class="a-panel-header">Tâches</div>
                                 <div class="a-panel-content">
                                     <div class="">
-                                        <div class="row" id="external-events">
+                                        <div class="row" id="external-events" style="overflow-y: scroll;height:200px;overflow-x:hidden;">
                                             @foreach ($alltask as $task)
                                                 <div class="external-event col-md-10" id="task_{{ $task->id }}" style="background-color:{{ $task->color }};color:{{ $task->letterColor }}">{{ $task->libelle }}</div>
                                             @endforeach

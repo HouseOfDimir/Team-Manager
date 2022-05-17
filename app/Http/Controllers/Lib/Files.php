@@ -18,7 +18,7 @@ class Files extends Controller{
      *
      * @return file to client
      */
-    public static function loadFile(Request $request, $inputName, $driver, $complement = ''){
+    public static function loadFile(Request $request, $inputName, $driver, $complement = ''){//dd($request);
         if($request->hasFile($inputName)){
             $path = $request->file($inputName)->store('/'.$complement, $driver);
             return $path;
@@ -26,6 +26,10 @@ class Files extends Controller{
             return null;
         }
     }
+
+   /*  public static function loadFile($fileinfo, $fileName, $driver){
+        return $fileinfo->store('/', $driver);
+    } */
 
     /** -------------------------------------------------------------------------------
      *                      Download file

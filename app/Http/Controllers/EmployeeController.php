@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Crypt;
 use HeadlessChromium\BrowserFactory;
 use Illuminate\Support\Facades\Storage;
 use Models\planningType;
+use Symfony\Component\Process\Process;
 
 class EmployeeController extends Controller
 {
@@ -133,8 +134,7 @@ class EmployeeController extends Controller
         return $employee;
     }
 
-    public function createPDFandSendToMail(Request $request){//dd($request);
-        //$allEmployee        = Employee::getAllEmployee();
+    public function createPDFandSendToMail(Request $request){
 
         $request->startDate = Carbon::createFromFormat('d/m/Y', $request->startDate)->format('Ymd');
         $request->endDate   = Carbon::createFromFormat('d/m/Y', $request->endDate)->format('Ymd');
@@ -143,26 +143,31 @@ class EmployeeController extends Controller
 
         if(planningType::getGlobalById($request->planningType)){
             $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.self::PLANNING_EQUIPE.self::IMAGE_EXTENSION;
-            $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningGlobal',['startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
+            //$cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=400 '.route('planning.getPlanningGlobal',['startDate' => $request->startDate, 'endDate' => $request->endDate]);
+            $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --enable-logging --window-size=1200,825 --screenshot="'.$fullPath.'" '.route('planning.getPlanningGlobal',['startDate' => $request->startDate, 'endDate' => $request->endDate]).' --virtual-time-budget=10000';
+
+            //dd($cmd);
             exec($cmd, $output, $code);
 
             foreach($request->fkEmployee as $item){
                 if($code == 0){
                     $mail = new EmailController();
-                    $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
+                    $mail->sendCalendarToEmployee($item, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
                 }
             }
-            unlink($fullPath);
+            //unlink($fullPath);
 
-        }else{dd('ko');
+        }else{
             foreach($request->fkEmployee as $item){
-                $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.$item->id.self::IMAGE_EXTENSION;
-                $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --window-size=1200,825 --force-device-scale-factor=1 --screenshot="'.$fullPath.'" --virtual-time-budget=1000 '.route('planning.getPlanningOneEmployee',['fkEmployee' => $item->id, 'startDate' => $request->startDate, 'endDate' => $request->endDate]).' 2>&1';
+                $fullPath   = $pathToSave.self::PLANNING_TITLE.'-'.$request->startDate.'-'.$request->endDate.'-'.$item.self::IMAGE_EXTENSION;
+                $cmd = '"C://Program Files/Google/Chrome/Application/chrome.exe" --disable-gpu --headless --run-all-compositor-stages-before-draw --enable-logging --window-size=1200,825 --screenshot="'.$fullPath.'" '.route('planning.getPlanningOneEmployee',['fkEmployee' => $item, 'startDate' => $request->startDate, 'endDate' => $request->endDate]).' --virtual-time-budget=10000';
+                //dd($cmd);
                 exec($cmd, $output, $code);
+
                 if($code == 0){
                     $mail = new EmailController();
-                    $mail->sendCalendarToEmployee($item->id, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
-                    unlink($fullPath);
+                    $mail->sendCalendarToEmployee($item, $fullPath, Carbon::createFromFormat('Ymd', $request->startDate)->format('d/m/Y'), Carbon::createFromFormat('Ymd', $request->endDate)->format('d/m/Y'));
+                    //unlink($fullPath);
                 }
             }
         }

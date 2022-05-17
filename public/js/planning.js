@@ -1,5 +1,5 @@
-$(function(){ console.log(config.params.param.initialView.valeur)
-    /* $('.verifyDate').datepicker({
+$(function(){
+    /* $('input[name="startDate"]').datepicker({
         format: 'dd/mm/yyyy',
         language: 'fr-FR,',
         autoclose: true,
@@ -10,7 +10,7 @@ $(function(){ console.log(config.params.param.initialView.valeur)
 
     $('.goToDate').on('click', function(){
         var darr = $('.verifyDate').val().split('/');
-        var dobj = new Date(darr[2], darr[1] -1, darr[0]).toISOString();console.log(dobj)
+        var dobj = new Date(darr[2], darr[1] -1, darr[0]).toISOString();
         calendar.gotoDate(dobj);
     });
     /* initialize the external events
@@ -61,6 +61,9 @@ $(function(){ console.log(config.params.param.initialView.valeur)
     })
 
     calendar = new Calendar(calendarEl, {
+        aspectRatio:2,
+        contentHeight:600,
+        dayMinWidth:config.params.param.dayMinWidth.valeur,
         headerToolbar: {
             left  : 'prev,next today',
             center: 'title',

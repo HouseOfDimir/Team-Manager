@@ -17,9 +17,9 @@ $(function(){
         droppable : false,
         weekends: false,
         locale: 'fr',
-        events: function(fetchInfo, successCallback, failureCallback){
-            events = [];
-            fetch(config.routes.getAllEvents + '?'+ new URLSearchParams({fkEmployee: config.data.fkEmployee ,end: config.data.end, start: config.data.start}), fetchGet())
+        events:function(fetchInfo, successCallback, failureCallback){
+            events= []
+            fetch(config.routes.getAllEvents + '?'+ new URLSearchParams({end: config.data.end, start: config.data.start}), fetchGet())
                 .then(response=>response.json())
                 .then(data => {
                     $.each(data, function(key, value){
@@ -33,22 +33,24 @@ $(function(){
                             start:value.start,
                             end:value.end,
                             parentId:value.resourceId
-                        });
-                    });
-                    successCallback(events);
-                });
+                        })
+                    })
+                    successCallback(events)
+                })
         },
         resources:function(fetchInfo, successCallback, failureCallback){
             resources= []
-            fetch(config.routes.getEmployeeById, fetchGet())
+            fetch(config.routes.getAllResources, fetchGet())
                 .then(response=>response.json())
                 .then(data => {
-                    resources.push({
-                        id:data.id,
-                        title:data.title
-                    });
-                    successCallback(resources);
-                });
+                    $.each(data, function(key, value){
+                        resources.push({
+                            id:value.id,
+                            title:value.title
+                        })
+                    })
+                    successCallback(resources)
+                })
         },
     })
     calendar.render();
