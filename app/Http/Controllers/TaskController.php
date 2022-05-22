@@ -22,16 +22,13 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function execute($fkTask = null)
+    public function execute(Task $fkTask = null)
     {
         $array = ['allTask'     => Task::getAllTasks(),
                   'letterColor' => letterColor::getAllLetterColor(),
                   'route'       => route('task.createTask')];
+        isset($fkTask) && $array['task'] = $fkTask;
 
-        if(isset($fkTask)){
-            $this->validateFkTask($fkTask);
-            $array['task'] = Task::getTaskById($fkTask);
-        }
         return view('task.index')->with($array);
     }
 
@@ -86,13 +83,11 @@ class TaskController extends Controller
         }
     }
 
-    public function deleteTask($fkTask){
-        $this->validateFkTask($fkTask);
-        Task::deleteTask($fkTask);
-        return redirect()->back()->with('success', 'Tâche supprimée avec succès !');
+    public function deleteTask(Task $fkTask){
+        return $fkTask->delete() ? redirect()->route('task.index')->with('success', 'Tâche supprimée avec succès !') : redirect()->back()->with('error', 'Une erreur est survenue, veuillez contacter votre administrateur !');
     }
 
-    public function toModifyTask($fkTask){
+    /* public function toModifyTask($fkTask){
         $this->validateFkTask($fkTask);
 
     }
@@ -103,5 +98,5 @@ class TaskController extends Controller
         $request->request->add(['fkTask' => $fkTask]);
         $this->validate($request, ['fkTask' => 'required|int|exists:\Models\Task,id']);
         return $request;
-    }
+    } */
 }

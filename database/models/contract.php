@@ -1,15 +1,18 @@
 <?php
 
-namespace database\Models;
+namespace Models;
 
-use Illuminate\Database\Eloquent\{Model, Collection};
+use Illuminate\Database\Eloquent\{Model, Collection,SoftDeletes};
 use Illuminate\Support\Carbon;
 
     class contract extends Model
     {
+        use SoftDeletes;
         const CREATED_AT = null;
         const UPDATED_AT = null;
+        const DELETED_AT = 'endDate';
 
+        protected $dateFormat    = 'Ymd';
         protected $table         = 'contract';
         protected $primaryKey    = 'id';
 
@@ -22,9 +25,9 @@ use Illuminate\Support\Carbon;
                                  'firstName', 'employee.name AS eName')->get();
         }
 
-        public static function getContractById(int $fkContract)
+        public static function getContractById(int $fkContract):contract
         {
-            return self::where('id', $fkContract)->whereNull('endDate')->first();
+            return self::find($fkContract);
         }
 
         public static function getContractByFkEmployee(int $fkEmployee):contract
@@ -45,7 +48,7 @@ use Illuminate\Support\Carbon;
         }
 
         public static function deleteContract($fkContract){
-            self::where('id', $fkContract)->update(['endDate' => Date('Ymd')]);
+            self::find($fkContract)->delete();
         }
     }
 // FILES COULD BE FACTURES ENERGIE, TELEPHONE, INTERNET, RIB, IBAN, CONTRAT (CEE CDD CDI)

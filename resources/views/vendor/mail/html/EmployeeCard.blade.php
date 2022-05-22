@@ -36,4 +36,4 @@
     </div>
 </div>
 
-Ceci est un mail automatique de l'application <b>{{ config('app.name') }}</b>, veuillez ne pas y répondre.
+<i>Ceci est un mail automatique de l'application <b>{{ config('app.name') }}</b>, veuillez ne pas y répondre.</i>

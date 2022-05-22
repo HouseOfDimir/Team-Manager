@@ -2,14 +2,17 @@
 
 namespace Models;
 
-use Illuminate\Database\Eloquent\{Model, Collection};
+use Illuminate\Database\Eloquent\{Model, Collection, SoftDeletes};
 use Illuminate\Http\Request;
 
     class Task extends Model
     {
+        use SoftDeletes;
         const CREATED_AT = null;
         const UPDATED_AT = null;
+        const DELETED_AT = 'endDate';
 
+        protected $dateFormat = 'Ymd';
         protected $table         = 'task';
         protected $primaryKey    = 'id';
 
@@ -37,12 +40,16 @@ use Illuminate\Http\Request;
 
         public static function deleteTask(int $fkTask):void
         {
-            self::where('id', $fkTask)->update(['endDate' => Date('Ymd')]);
+            self::find($fkTask)->delete();
         }
 
         public static function getTaskById(int $fkTask):Task
         {
             return self::find($fkTask);
+        }
+
+        public function colorLetter(){
+            return $this->hasOne(letterColor::class, 'fkLetterColor');
         }
     }
 

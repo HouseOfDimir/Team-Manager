@@ -44,7 +44,7 @@ Route::group(['prefix' => 'task'], function(){
     Route::get('/view/{fkTask?}', 'TaskController@execute')->name('task.index');
     Route::get('/administration', 'TaskController@administration')->name('task.administration');
     Route::post('/createTask', 'TaskController@createTask')->name('task.createTask');
-    Route::get('/deleteTask', 'TaskController@deleteTask')->name('task.deleteTask');
+    Route::get('/deleteTask/{fkTask}', 'TaskController@deleteTask')->name('task.deleteTask');
     Route::post('/editParamAdmin', 'TaskController@editParamAdmin')->name('task.editParamAdmin');
 });
 

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Lib\Files;
-use database\Models\{contract, Employee, contractType};
+use database\Models\{Employee, contractType};
 use Illuminate\Http\Request;
 use Models\fileEmployee;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Models\contract;
 
 class ContractController extends Controller
 {
@@ -21,7 +22,7 @@ class ContractController extends Controller
         $this->middleware('auth');
     }
 
-    public function execute($fkContrat = null)
+    public function execute(contract $fkContract = null)
     {
         $allEmployee = Employee::getAllEmployee();
         foreach($allEmployee as &$employee){
@@ -29,24 +30,22 @@ class ContractController extends Controller
             $employee->name      = Crypt::decrypt($employee->name);
         }
 
+        $allContract = contract::getAllContract();
+        foreach($allContract as &$item){
+            $this->employeeDecryptor($item);
+        }
+
         $array = ['allEmployee'         => $allEmployee,
                   'route'               => route('contract.createContract'),
                   'allContractType'     => contractType::getAllContractType(),
-                  'allEmployeeContract' => contract::getAllContract(),
+                  'allEmployeeContract' => $allContract,
                   'title'               => self::TITLE_BASE];
-        if($fkContrat){
-            $request = new \Illuminate\Http\Request();
-            $request->setMethod('POST');
-            $request->request->add(['fkContract' => $fkContrat]);
-            $this->validate($request, ['fkContract' => 'required|int|exists:\database\Models\contract,id']);
-            if($contract = contract::getContractById($fkContrat)){
-                $contract->startPeriod = Carbon::createFromFormat('Ymd', $contract->startPeriod)->format('d/m/Y');
-                $contract->endPeriod   = Carbon::createFromFormat('Ymd', $contract->endPeriod)->format('d/m/Y');
-                $array['contract']     = $contract;
+
+        if($fkContract){
+                $fkContract->startPeriod = Carbon::createFromFormat('Ymd', $fkContract->startPeriod)->format('d/m/Y');
+                $fkContract->endPeriod   = Carbon::createFromFormat('Ymd', $fkContract->endPeriod)->format('d/m/Y');
+                $array['contract']     = $fkContract;
                 $array['title']        = self::TITLE_EDIT;
-            }else{
-                abort(404);
-            }
         }
 
         return view('contract.index')->with($array);
@@ -64,12 +63,14 @@ class ContractController extends Controller
         return redirect()->back()->with('success', 'Contrat enregistré avec succès !');
     }
 
-    public function deleteContract($fkContrat){
-        $request = new \Illuminate\Http\Request();
-        $request->setMethod('POST');
-        $request->request->add(['fkContract' => $fkContrat]);
-        $this->validate($request, ['fkContract' => 'required|int|exists:\database\Models\contract,id']);
-        contract::deleteContract($fkContrat);
-        return redirect()->back()->with('success', 'Contrat supprimé avec succès !');
+    public function deleteContract(contract $fkContract){
+        $fkContract->delete();
+        return $fkContract->delete() ? redirect()->route('contract.index')->with('success', 'Contrat supprimé avec succès !') : redirect()->back()->with('error', 'Une erreur est survenue, veuillez contacter votre administrateur !');
+    }
+
+    public function employeeDecryptor($employee){
+        $employee->firstName    = Crypt::decrypt($employee->firstName);
+        $employee->eName        = Crypt::decrypt($employee->eName);
+        return $employee;
     }
 }

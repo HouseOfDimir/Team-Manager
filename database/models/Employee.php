@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\{Model, Collection};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
     {
+        use SoftDeletes;
         const CREATED_AT = null;
         const UPDATED_AT = null;
+        const DELETED_AT = 'endDate';
 
         protected $table         = 'employee';
         protected $primaryKey    = 'id';
@@ -100,6 +103,10 @@ class Employee extends Model
 
         public static function getResourceEmployeeById($fkEmployee){
             return self::where('id', $fkEmployee)->select('id', 'firstName AS title')->first();
+        }
+
+        public function getContrat(){
+            return $this->hasOne('contract')->select('contract.id AS id', 'dureeHebdo', 'dureeAnnuelle', 'contractType.name AS libelleContrat');
         }
     }
 
