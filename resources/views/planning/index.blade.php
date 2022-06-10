@@ -36,6 +36,24 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-12">
+                            <div class="a-panel a-panel-warning a-box-shadow">
+                                <div class="a-panel-header">Employés</div>
+                                <div class="a-panel-content">
+                                    <div class="">
+                                        <div class="row" id="external-events" style="overflow-y: scroll;height:200px;overflow-x:hidden;">
+                                            @foreach ($allEmployee as $item)
+                                                <label><input type="checkbox" checked class="a-check" value="{{ $item->id }}" name="fkEmployee[]"><span class="a-btn a-info" role="button" >{{ $item->firstName }}</span></label>
+                                            @endforeach
+                                            <div class="col-md-12">
+                                                <button class="a-btn a-info loadDataEmployee"><i class="fal fa-paper-plane"></i> Charger</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

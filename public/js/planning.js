@@ -77,6 +77,7 @@ $(function(){
         slotDuration: config.params.param.slotDuration.valeur,
         weekends: config.params.param.weekends.valeur,
         datesAboveResources:true,
+        forceEventDuration:true,
         eventDisplay:'block',
         allDaySlot: false,
         editable  : true,
@@ -105,7 +106,8 @@ $(function(){
         },
         resources:function(fetchInfo, successCallback, failureCallback){
             resources= []
-            fetch(config.routes.getAllResources, fetchGet())
+            if(typeof config.routes.getAllResources == 'string'){
+                fetch(config.routes.getAllResources + '?'+ new URLSearchParams({end: moment(fetchInfo.end).format('YYYYMMDD'), start: moment(fetchInfo.start).format('YYYYMMDD')}), fetchGet())
                 .then(response=>response.json())
                 .then(data => {
                     $.each(data, function(key, value){
@@ -116,12 +118,21 @@ $(function(){
                     })
                     successCallback(resources)
                 })
+            }else{
+                $.each(config.routes.getAllResources, function(key, value){
+                    resources.push({
+                        id:value.id,
+                        title:value.title
+                    })
+                })
+                successCallback(resources)
+            }
         },
         eventReceive:function(info){
-            var end       = moment(info.event._instance.range.end).subtract(1, 'h')
+            //var end       = moment(info.event._instance.range.end).subtract(1, 'h')
             var eventData = {
                 start     : moment(info.event.start).format("YYYY-MM-DD HH-mm"),
-                end       : moment(end._d).format("YYYY-MM-DD HH-mm"),
+                end       : moment(info.event.end).format("YYYY-MM-DD HH-mm"),
                 fkTask    : info.draggedEl.id.split('_')[1],
                 fkEmployee: info.event._def.resourceIds[0],
                 eventDate : moment(info.event.start).format("YYYYMMDD"),
@@ -130,13 +141,14 @@ $(function(){
             fetch(config.routes.addEvent, fetchPost(eventData))
             .then(response=>response.json())
                     .then(data => {
-                        console.log(calendar.getEvents());
                         $.each(calendar.getEvents(), function(key, value){
                             if(value._def.publicId == ''){
                                 value._def.publicId = data.event.id.toString();
                                 value.id = data.event.id.toString();
                             }
                         });
+                        console.log(eventData)
+                        addHoursToLibelle(eventData.fkEmployee, eventData.start.split(' ')[0], data.totalPerDay, data.totalPerWeek)
                         $.atomNotify(data.feedback, data.style)
                     })
                     .catch(function(error){
@@ -147,14 +159,16 @@ $(function(){
         eventClick: function(event){
             event.el.addEventListener('click', function(){
                 eventData = {
-                    type   : config.modelFunc.delete,
-                    fkEvent: event.event.id
+                    type      : config.modelFunc.delete,
+                    fkEvent   : event.event.id,
+                    fkEmployee: event.event._def.resourceIds[0],
+                    eventDate : moment(event.event.start).format("YYYYMMDD")
                 }
-
                 calendar.getEventById(event.event.id).remove();
                 fetch(config.routes.addEvent, fetchPost(eventData))
                     .then(response=>response.json())
                     .then(data => {
+                        addHoursToLibelle(event.event._def.resourceIds[0], moment(event.event.start).format("YYYY-MM-DD HH:mm").split(' ')[0], data.totalPerDay, data.totalPerWeek)
                         $.atomNotify(data.feedback, data.style)
                     })
                     .catch(function(error){
@@ -174,7 +188,7 @@ $(function(){
             fetch(config.routes.addEvent, fetchPost(eventData))
                 .then(response=>response.json())
                 .then(data => {
-                    console.log(data)
+                    addHoursToLibelle(eventData.fkEmployee, eventData.start.split(' ')[0], data.totalPerDay, data.totalPerWeek)
                     $.atomNotify(data.feedback, data.style)
                 })
                 .catch(function(error){
@@ -182,8 +196,29 @@ $(function(){
                 })
         }
     })
-    calendar.render()
-})
+    calendar.render();
+
+    $('.loadDataEmployee').on('click', function(){
+        var array = [];
+        $.each($("input[name='fkEmployee[]']:checked"), function(){
+            array.push({id:$(this).val(),title:$(this).siblings('span').text()})
+        });
+        config.routes.getAllResources = array;
+        calendar.refetchResources();
+            //calendar.refetchEvents();
+    });
+});
+
+function addHoursToLibelle(fkEmployee, date, totalPerDay, totalPerWeek){console.log(totalPerDay, totalPerWeek)
+    var input = $(`.fc-col-header-cell[data-resource-id="${fkEmployee}"][data-date="${date}"]`)
+        .children('.fc-scrollgrid-sync-inner')
+        .children('.fc-col-header-cell-cushion');
+    var newText = `${input.text().split(' ')[0]} ${totalPerDay}h ${totalPerWeek}h`;
+    input.text('');
+    input.text(newText);
+}
+
+// reste au chargement + infos à la semaine + ajouter icône pour faire beau
 
 function fetchPost(datas){
     return {

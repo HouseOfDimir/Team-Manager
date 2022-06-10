@@ -74,6 +74,22 @@ class planning extends Model
             ->select('planning.id AS id', 'libelle AS title', 'eventStart AS start', 'eventEnd AS end','fkEmployee AS resourceId', 'color AS backgroundColor', 'letterColor AS color')
             ->get();
         }
+
+        public static function getSumDayEmployee($fkEmployee, $eventDate){
+            return self::where('fkEmployee', $fkEmployee)
+                        ->where('eventDate', $eventDate)
+                        ->whereNull('endDate')
+                        ->select('eventStart', 'eventEnd')
+                        ->get();
+        }
+
+        public static function getSumDayEmployeeWeek($fkEmployee, $startDate, $endDate){
+            return self::where('fkEmployee', $fkEmployee)
+                        ->whereBetween('eventDate', [$startDate, $endDate])
+                        ->whereNull('endDate')
+                        ->select('eventStart', 'eventEnd')
+                        ->get();
+        }
     }
 // FILES COULD BE FACTURES ENERGIE, TELEPHONE, INTERNET, RIB, IBAN, CONTRAT (CEE CDD CDI)
 ?>

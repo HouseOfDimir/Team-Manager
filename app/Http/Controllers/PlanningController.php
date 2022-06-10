@@ -42,8 +42,13 @@ class PlanningController extends Controller
             }
         }
 
+        $allEmployee = Employee::getAllEmployee();
+        foreach($allEmployee as &$item){
+            self::employeeDecryptor($item);
+        }
+
         return view('planning.index')->with(['alltask'       => Task::getAllTasks(),
-                                             'allEmployee'   => Employee::getAllEmployee(),
+                                             'allEmployee'   => $allEmployee,
                                              'paramPlanning' => $paramPlanning,
                                              'fullScreen'    => 1]);
     }
@@ -59,25 +64,53 @@ class PlanningController extends Controller
 
     public function ajaxTourbi(Request $request)
     {
+        // ajouter la récup du total de la journée : datas => fkEmployee, eventDate
         switch($request->type){
             case config('app.switch.add'):
-                $event = planning::insertEvent($request);
-                    return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement ajouté avec succès !', 'event' => $event])
+                $event        = planning::insertEvent($request);
+                list($totalHourDay, $totalHourWeek) = $this->getSumHourDay($request->fkEmployee, $request->eventDate);
+                    return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement ajouté avec succès !', 'event' => $event, 'totalPerDay' => $totalHourDay, 'totalPerWeek' => $totalHourWeek])
                     : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
 
             case config('app.switch.update'):
-                $event = planning::updateEvent($request);
-                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement modifié avec succès !', 'event' => $event])
+                $event        = planning::updateEvent($request);
+                list($totalHourDay, $totalHourWeek) = $this->getSumHourDay($request->fkEmployee, $request->eventDate);
+                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement modifié avec succès !', 'event' => $event, 'totalPerDay' => $totalHourDay, 'totalPerWeek' => $totalHourWeek])
                 : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
 
             case config('app.switch.delete'):
-                $event = planning::deleteEvent($request);
-                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement supprimé avec succès !', 'event' => $event])
+                $event        = planning::deleteEvent($request);
+                list($totalHourDay, $totalHourWeek) = $this->getSumHourDay($request->fkEmployee, $request->eventDate);
+                return $event !== null ? response()->json(['style' => 'success', 'feedback' => 'Evènement supprimé avec succès !', 'event' => $event, 'totalPerDay' => $totalHourDay, 'totalPerWeek' => $totalHourWeek])
                 : response()->json(['style' => 'error', 'feedback' => 'Un erreur est survenue, veuillez contacter votre administrateur !']);
             break;
         }
+    }
+
+    public function getSumHourDay($fkEmployee, $eventDate){
+        $carbonStDate         = new Carbon($eventDate);
+        $allEventDayEmployee  = Planning::getSumDayEmployee($fkEmployee, $eventDate);
+        $allEventWeekEmployee = Planning::getSumDayEmployeeWeek($fkEmployee, $carbonStDate->startOfWeek()->format('Ymd'), $carbonStDate->endOfWeek()->format('Ymd'));
+
+        $timeAdded     = new Carbon();
+        $timeAddedWeek = new Carbon();
+        $currentTime   = new Carbon();
+
+        foreach($allEventDayEmployee as $item){
+            $startDate = new Carbon($item->eventStart);
+            $endDate   = new Carbon($item->eventEnd);
+            $timeAdded->add($endDate->diff($startDate));
+        }
+
+        foreach($allEventWeekEmployee as $item){
+            $startDate   = new Carbon($item->eventStart);
+            $endDate     = new Carbon($item->eventEnd);
+            $timeAddedWeek->add($endDate->diff($startDate));
+        }
+
+        return array($timeAdded->diff($currentTime)->format('%H:%I'), $timeAddedWeek->diff($currentTime)->format('%H:%I'));
     }
 
     public function getAllEmployee(Request $request){
@@ -114,5 +147,18 @@ class PlanningController extends Controller
                 'formatedEndDate' => \Carbon\Carbon::createFromFormat('Ymd', $endDate)->format('d/m/Y')
             ]
         );
+    }
+
+    public function employeeDecryptor($employee){
+        $employee->birthDate    = Carbon::createFromFormat('Ymd', $employee->birthDate)->format('d/m/Y');
+        $employee->firstName    = Crypt::decrypt($employee->firstName);
+        $employee->name         = Crypt::decrypt($employee->name);
+        $employee->greenNumber  = Crypt::decrypt($employee->greenNumber);
+        $employee->mail         = Crypt::decrypt($employee->mail);
+        $employee->phone        = Crypt::decrypt($employee->phone);
+        $employee->adress       = Crypt::decrypt($employee->adress);
+        $employee->zipCode      = Crypt::decrypt($employee->zipCode);
+        $employee->city         = Crypt::decrypt($employee->city);
+        return $employee;
     }
 }
